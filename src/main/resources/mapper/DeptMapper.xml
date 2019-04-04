@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.dao.DeptDao">
+
+	<select id="get" resultType="com.example.demo.domain.DeptDO">
+		select
+		`dept_id`,`parent_id`,`name`,`zzjgdm`,`dwlx`,`dwxz`,`dwxz_code`,`fwdh`,`address`,`lxr`,`phone`,`order_num`,`del_flag`,`dwlx` from sys_dept
+		where dept_id = #{value}
+	</select>
+
+	<select id="list" resultType="com.example.demo.domain.DeptDO">
+		<choose>
+			<when test="name!=null">
+				<bind name="likeName" value="'%' + name + '%'"/>
+			</when>
+			<otherwise>
+				<bind name="likeName" value="'%%'"/>
+			</otherwise>
+		</choose>
+		<choose>
+			<when test="fwdh!=null">
+				<bind name="likeFwdh" value="'%' + fwdh + '%'"/>
+			</when>
+			<otherwise>
+				<bind name="likeFwdh" value="'%%'"/>
+			</otherwise>
+		</choose>
+		<choose>
+			<when test="dwxz!=null">
+				<bind name="likeDwxz" value="'%' + dwxz + '%'"/>
+			</when>
+			<otherwise>
+				<bind name="likeDwxz" value="'%%'"/>
+			</otherwise>
+		</choose>
+		<choose>
+			<when test="dwxz!=null and dwxz != ''">
+				select t.`dept_id`,t.`parent_id`,t.`name`,t.dwlx,t.dwxz_code,t.fwdh,t.`order_num`,t.`del_flag`,c.name as dwxz from
+		sys_dept t left join sys_dict c on t.dwxz_code = c.value
+			</when>
+			<otherwise>
+				select t.`dept_id`,t.`parent_id`,t.`name`,t.dwlx,t.dwxz_code,t.fwdh,t.`order_num`,t.`del_flag` from
+		sys_dept t
+			</otherwise>
+		</choose>
+		 
+		<where>
+			<if test="dwxz != null and dwxz != ''">c.type='sys_dept_type'</if>
+			<if test="deptId != null and deptId != ''"> and t.dept_id = #{deptId} </if>
+			<if test="parentId != null and parentId != ''"> and t.parent_id = #{parentId} </if>
+			<if test="name != null and name != ''"> and t.name like #{likeName} </if>
+			<if test="dwxz != null and dwxz != ''"> and c.name like #{likeDwxz} </if>
+			<if test="fwdh != null and fwdh != ''"> and t.fwdh like #{likeFwdh} </if>
+			<if test="orderNum != null and orderNum != ''"> and t.order_num = #{orderNum} </if>
+			<if test="delFlag != null and delFlag != ''"> and t.del_flag = #{delFlag} </if>
+			<if test="mulSsdw != null"> and t.dept_id in
+				<foreach collection="mulSsdw" index="index" item="item" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		<choose>
+			<when test="sort != null and sort.trim() != ''">
+				order by ${sort} ${order}
+			</when>
+			<otherwise>
+				order by order_num
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="listDwxz" resultType="com.example.demo.domain.DeptDO">
+		<choose>
+			<when test="name!=null">
+				<bind name="likeName" value="'%' + name + '%'"/>
+			</when>
+			<otherwise>
+				<bind name="likeName" value="'%%'"/>
+			</otherwise>
+		</choose>
+		<choose>
+			<when test="dwxz!=null">
+				<bind name="likeDwxz" value="'%' + dwxz + '%'"/>
+			</when>
+			<otherwise>
+				<bind name="likeName" value="'%%'"/>
+			</otherwise>
+		</choose>
+		<choose>
+			<when test="fwdh!=null">
+				<bind name="likeFwdh" value="'%' + fwdh + '%'"/>
+			</when>
+			<otherwise>
+				<bind name="likeName" value="'%%'"/>
+			</otherwise>
+		</choose>
+		select t.`dept_id`,t.`parent_id`,t.`name`,t.dwlx,t.dwxz_code,t.fwdh,t.`order_num`,t.`del_flag`,c.name as dwxz from
+		sys_dept t left join sys_dict c on t.dwxz_code = c.value
+		<where>
+			c.type='sys_dept_type'
+			<if test="deptId != null and deptId != ''"> and t.dept_id = #{deptId} </if>
+			<if test="parentId != null and parentId != ''"> and t.parent_id = #{parentId} </if>
+			<if test="name != null and name != ''"> and t.name like #{likeName} </if>
+			<if test="dwxz != null and dwxz != ''"> and c.name like #{likeDwxz} </if>
+			<if test="fwdh != null and fwdh != ''"> and t.fwdh like #{likeFwdh} </if>
+			<if test="orderNum != null and orderNum != ''"> and t.order_num = #{orderNum} </if>
+			<if test="delFlag != null and delFlag != ''"> and t.del_flag = #{delFlag} </if>
+			<if test="mulSsdw != null"> and t.dept_id in
+				<foreach collection="mulSsdw" index="index" item="item" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		<choose>
+			<when test="sort != null and sort.trim() != ''">
+				order by ${sort} ${order}
+			</when>
+			<otherwise>
+				order by order_num
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="count" resultType="int">
+		<choose>
+			<when test="name!=null">
+				<bind name="likeName" value="'%' + name + '%'"/>
+			</when>
+			<otherwise>
+				<bind name="likeName" value="'%%'"/>
+			</otherwise>
+		</choose>
+		<choose>
+			<when test="dwxz!=null">
+				<bind name="likeDwxz" value="'%' + name + '%'"/>
+			</when>
+			<otherwise>
+				<bind name="likeName" value="'%%'"/>
+			</otherwise>
+		</choose>
+		<choose>
+			<when test="fwdh!=null">
+				<bind name="likeFwdh" value="'%' + name + '%'"/>
+			</when>
+			<otherwise>
+				<bind name="likeName" value="'%%'"/>
+			</otherwise>
+		</choose>
+		select count(*) from sys_dept
+		<where>
+			<if test="deptId != null and deptId != ''"> and dept_id = #{deptId} </if>
+			<if test="parentId != null and parentId != ''"> and parent_id = #{parentId} </if>
+			<if test="name != null and name != ''"> and name like #{likeName} </if>
+			<if test="dwxz != null and dwxz != ''"> and dwxz like #{likeDwxz} </if>
+			<if test="fwdh != null and fwdh != ''"> and fwdh like #{likeFwdh} </if>
+			<if test="orderNum != null and orderNum != ''"> and order_num = #{orderNum} </if>
+			<if test="delFlag != null and delFlag != ''"> and del_flag = #{delFlag} </if>
+			<if test="mulSsdw != null"> and dept_id in
+				<foreach collection="mulSsdw" index="index" item="item" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</select>
+
+	<insert id="save" parameterType="com.example.demo.domain.DeptDO"
+		useGeneratedKeys="true" keyProperty="deptId">
+		insert into sys_dept
+		(
+		dept_id,
+		`parent_id`,
+		`name`,
+		`dwxz`,
+		`fwdh`,
+		zzjgdm ,
+		address,
+		lxr,
+		phone,
+		`order_num`,
+		`del_flag`,`dwlx`,
+		`dwxz_code`
+		)
+		values
+		(
+		#{deptId},
+		#{parentId},
+		#{name},
+		#{dwxz},
+		#{fwdh},
+		#{zzjgdm} ,
+		#{address},
+		#{lxr},
+		#{phone},
+		#{orderNum},
+		#{delFlag},#{dwlx},
+		#{dwxzCode}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.example.demo.domain.DeptDO">
+		update sys_dept
+		<set>
+			<if test="parentId != null">`parent_id` = #{parentId}, </if>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="dwxz != null">`dwxz` = #{dwxz}, </if>
+			<if test="dwxzCode != null">`dwxz_code` = #{dwxzCode}, </if>
+			<if test="fwdh != null">`fwdh` = #{fwdh}, </if>
+			<if test="zzjgdm != null">`zzjgdm` = #{zzjgdm}, </if>
+			<if test="address != null">`address` = #{address}, </if>
+			<if test="lxr != null">`lxr` = #{lxr}, </if>
+			<if test="phone != null">`phone` = #{phone}, </if>
+			<if test="orderNum != null">`order_num` = #{orderNum}, </if>
+			<if test="dwlx != null">`dwlx` = #{dwlx}, </if>
+			<if test="delFlag != null">`del_flag` = #{delFlag}</if>
+		</set>
+		where dept_id = #{deptId}
+	</update>
+
+	<delete id="remove">
+		delete from sys_dept where dept_id = #{value}
+	</delete>
+
+	<delete id="batchRemove">
+		delete from sys_dept where dept_id in
+		<foreach item="deptId" collection="array" open="(" separator=","
+			close=")">
+			#{deptId}
+		</foreach>
+	</delete>
+	
+	<select id="listParentDept" resultType="long">
+		select DISTINCT parent_id from sys_dept
+	</select>
+
+    <select id="getDeptUserNumber" resultType="int">
+		select count(*) from sys_user where dept_id = #{value}
+	</select>
+
+    <select id="getDeptIdsByLx" resultType="com.example.demo.domain.DeptDO">
+		select dept_id from sys_dept where dwlx = #{type}
+	</select>
+
+
+</mapper>
